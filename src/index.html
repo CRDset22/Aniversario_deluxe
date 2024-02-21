@@ -8,15 +8,79 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/main.scss">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 <body>
     <header class="hero">
         <div class="container">
             <img class="hero__logo" src="./images/Logo_happy_birthday.jpg" alt="happy-birthday">
             <P class="hero__text">
-                O maior Aniversario do ano <span id="contador">1d 1h 5m 10s</span>
+                O maior Aniversario do ano <span id="contador"></span>
             </P>
+            <div class="infos-bar">
+                <ul class="infos-bar__infos">
+                    <li class="infos-bar__infos__item">
+                        <b>Localização</b>
+                        Rua do Chinês, 1800 - Chinatown Brasileira - São Paulo
+                    </li>
+                    <li class="infos-bar__infos__item">
+                        <b>Entrada</b>
+                        Franca
+                    </li>
+                    <li class="infos-bar__infos__item">
+                        <b>Quando</b>
+                        28/02/2024 às 19hrs
+                    </li>
+                </ul>
+                
+            </div>
+            <P class="hero__text2">
+                Os presentes sugeridos(OBRIGATÓRIOS) a seguir estão descritos abaixo
+            </P>
+        </div>
+    </header>
 
+    <section class="gift gift--bitcoin" >
+        <div class="container" data-aos="fade-right">
+            <div class="gift__details">
+                <h2 class="gift__details__title">BitCoin</h2>
+                <p class="gift__details__description">O sistema financeiro tradicional indicam um futuro promissor para essa moeda digital,um divisor de águas, muitos bancos agora exploram o Bitcoin como forma de oferecer novos serviços e atrair clientes. O uso de criptomoedas em jogos online já é realidade e tende a crescer. Milionários e investidores institucionais estão cada vez mais interessados no Bitcoin.A descentralização, a segurança e a transparência da moeda digital consolidará um futuro mais livre e inclusivo.</p>
+            </div>
+            <img class="gift__image" src="./images/bitcoin.webp" alt="BitCoin">
+        </div>
+    </section>
+
+    <section class="gift gift--esmeralda gift--image-left" >
+        <div class="container" data-aos="fade-left">
+            <div class="gift__details">
+                <h2 class="gift__details__title">Esmeralda</h2>
+                <p class="gift__details__description">Em um mundo de pedras preciosas, a esmeralda reina soberana. Sua cor verde vibrante, símbolo de esperança e abundância, cativa olhares e encanta corações desde a antiguidade. Mais do que um adorno, a esmeralda é uma joia carregada de história, significado e beleza atemporal..</p>
+            </div>
+            <img class="gift__image" src="./images/esmeraldas.jpg.png" alt="Esmeralda">
+        </div>
+    </section>
+
+    <section class="gift gift--katana" >
+        <div class="container" data-aos="fade-right">
+            <div class="gift__details">
+                <h2 class="gift__details__title">Katana</h2>
+                <p class="gift__details__description">A katana, a lendária espada samurai, transcende o mero aço, erguendo-se como um símbolo de força, tradição e maestria. Forjada com meticulosa precisão, sua lâmina curva e afiada representa a alma do guerreiro, pronta para defender a honra e a justiça. Empunhada por samurais e ninjas, a katana era mais do que uma arma, era uma extensão do corpo e do espírito, imbuída de séculos de história e filosofia Mais do que uma arma mortal, a katana representa a cultura e a história do Japão. Ela é reverenciada como um símbolo de força, honra e tradição, inspirando artistas, escritores e cineastas ao longo dos séculos. A katana transcende o tempo e o espaço, erguendo-se como um ícone atemporal da bravura e do espírito indomável.</p>
+            </div>
+            <img class="gift__image" src="./images/katana.jpg" alt="Katana">
+        </div>
+    </section>
+
+    <section class="gift gift--lamborghini gift--image-left" >
+        <div class="container" data-aos="fade-left">
+            <div class="gift__details">
+                <h2 class="gift__details__title">Lamborghini</h2>
+                <p class="gift__details__description">O Lamborghini Gallardo, um touro furioso em forma de automóvel, ruge com ferocidade e elegância pelas estradas do mundo. Nascido em 2003, ele desafia as leis da física com sua velocidade estonteante e design aerodinâmico que corta o vento como uma lâmina.Mais do que um veículo, o Lamborghini Gallardo é uma experiência visceral que combina adrenalina, luxo e a emoção de domar uma fera. É um símbolo de status, poder e a personificação da filosofia Lamborghini: "The best is yet to come."</p>
+            </div>
+            <img class="gift__image" src="./images/lamborghini-gallardo.jpg" alt="Lamborghini">
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 </html>

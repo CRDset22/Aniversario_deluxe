@@ -1,13 +1,14 @@
 @use 'hero';
-
+@use 'components/infos_bar';
+@use 'gift';
+@use 'variables';
 
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Roboto, sans-serif;
-    //color: variables.$textColor;
-    color: #000;
+    color:variables.$textColor;
     list-style: none;
 }
 
