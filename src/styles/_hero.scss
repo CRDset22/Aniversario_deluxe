@@ -29,11 +29,18 @@
         text-align: center;
     }
 
+    /* Logo em formato de emblema circular: antes só a altura era fixa
+       (largura seguia a foto, 626x437), então o border-radius de 200px
+       não formava um círculo de verdade, e a regra "margin-right: 25px"
+       sobrescrevia o "auto" da linha anterior, empurrando o logo para
+       fora do centro. Agora largura = altura e object-fit: cover recorta
+       a foto para caber no círculo sem distorcer. */
     &__logo {
-        border-radius: 200px;
-        margin: 0 auto 50px;
-        margin-right: 25px;
+        width: 80px;
         height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 0 auto 50px;
         display: block;
     }
 
@@ -41,6 +48,7 @@
         padding: 40px 0;
 
         &__logo {
+            width: 40px;
             height: 40px;
         }
 

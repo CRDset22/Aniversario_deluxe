@@ -1,0 +1,240 @@
+==================================================================
+RELATÓRIO DE REVISÃO - ANIVERSÁRIO DELUXE
+Revisão de src/index.html, src/styles/*.scss, src/scripts/main.js,
+package.json e organização do projeto
+==================================================================
+
+Este projeto usa Parcel (bundler) + SCSS, diferente do projeto anterior
+(HTML/CSS puro). Para validar as correções de verdade, o pacote foi
+instalado (`npm install`) e compilado (`npx parcel build`) durante a
+revisão — não foi uma checagem só visual do código.
+
+
+------------------------------------------------------------------
+PARTE 1 - ACHADO MAIS GRAVE: O BUILD NÃO COMPILAVA DO ZERO
+------------------------------------------------------------------
+
+[BLD-01] Dependência "sharp" quebrava qualquer instalação nova
+  O que aconteceu: rodei "npm install" e "npx parcel build" para testar
+  o projeto de verdade. O build FALHOU com o erro:
+
+      Could not resolve module ".../sharp-linux-x64.node"
+      Error: Something went wrong installing the "sharp" module
+
+  Causa: "sharp" é uma biblioteca de processamento de imagem com um
+  componente nativo (binário compilado) que precisa ser baixado na
+  instalação. Em qualquer ambiente sem esse download disponível — como
+  o desta revisão, ou o computador de outro colega, ou um servidor de
+  CI/CD — o "npm install" falha nessa etapa, E o Parcel se recusa a
+  rodar o build porque o pacote está listado no package.json mas não
+  foi instalado direito.
+
+  O detalhe que agrava o problema: NENHUM script do projeto ("dev" ou
+  "build" no package.json) chama o sharp diretamente, e nenhum
+  componente do site usa as sintaxes do Parcel que dependem dele (como
+  "imagem.jpg?width=400"). Ou seja, o projeto pagava o preço de uma
+  dependência frágil sem nunca se beneficiar dela.
+
+  Também havia um arquivo "sharp.config.json" na raiz (configurando
+  qualidade 75 para PNGs), mas como nada chamava o sharp, essa
+  configuração nunca era lida — outro sinal de que a intenção original
+  (otimizar imagens automaticamente) nunca chegou a ser implementada.
+
+  Correção: "sharp" removido de devDependencies no package.json, e
+  "sharp.config.json" removido do projeto. Depois disso, "npm install"
+  e "npx parcel build src/index.html" rodaram e terminaram sem erros
+  (confirmado nesta revisão). O package-lock.json foi regenerado do
+  zero, então já reflete a remoção.
+
+  Se um dia você quiser otimizar as imagens automaticamente, o caminho
+  mais simples com Parcel é usar os parâmetros de URL dele
+  (ex.: <img src="foto.jpg?width=800">), que já vêm prontos sem precisar
+  gerenciar o sharp manualmente.
+
+
+------------------------------------------------------------------
+PARTE 2 - IMAGENS DESPROPORCIONAIS E PADRONIZAÇÃO
+------------------------------------------------------------------
+
+[IMG-01] Fotos de presente com proporções muito diferentes
+  Antes: .gift__image { max-width: 360px; }  (sem altura definida)
+  Problema: cada foto tinha uma proporção (bitcoin 1,77 : esmeralda
+            1,82 : katana 1,00 quadrada : lamborghini 1,33), então cada
+            card de presente ficava com uma altura de imagem diferente
+            — a vitrine parecia desalinhada.
+  Depois:
+      .gift__image {
+          width: 360px;
+          max-width: 100%;
+          aspect-ratio: 4 / 3;
+          object-fit: contain;
+          background-color: variables.$corPrataClaro;
+          border-radius: 12px;
+          padding: 16px;
+      }
+  Foi usado "contain" (não "cover") de propósito: como as 4 fotos têm
+  composições muito diferentes entre si, "cover" arriscaria cortar parte
+  da katana ou do carro. Com "contain" + fundo branco + borda, o produto
+  aparece inteiro, e a caixa fica do mesmo tamanho em todos os cards —
+  efeito de vitrine, como numa loja.
+
+[IMG-02] Logo do cabeçalho não formava um círculo de verdade
+  Antes:
+      &__logo {
+          border-radius: 200px;
+          margin: 0 auto 50px;
+          margin-right: 25px;
+          height: 80px;
+      }
+  Problema duplo:
+    1) só a altura (80px) era fixa; a largura seguia a proporção
+       original da foto (626x437 = 1,43), então o resultado era uma
+       "pílula" larga, não um círculo, apesar do border-radius alto.
+    2) a linha "margin-right: 25px" sobrescrevia o "auto" que vinha da
+       linha anterior ("margin: 0 auto 50px") — com a margem esquerda
+       em "auto" e a direita fixa em 25px, o navegador empurra todo o
+       espaço livre para a esquerda, e o logo fica encostado no lado
+       direito do contêiner, e não centralizado como era a intenção.
+  Depois:
+      &__logo {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 50%;
+          margin: 0 auto 50px;
+      }
+  Agora largura = altura (círculo real), object-fit: cover recorta a
+  foto sem distorcer, e a margem conflitante foi removida — o logo
+  volta a ficar centralizado.
+
+[IMG-03] Nome de arquivo com dupla extensão
+  Antes: src="./images/esmeraldas.jpg.png"
+  Problema: o arquivo tinha duas extensões coladas (.jpg.png) — sinal
+            de que foi salvo/convertido sem cuidado. Funciona, mas
+            confunde (o formato real é PNG, não JPG).
+  Depois: arquivo renomeado para "esmeraldas.png" e o caminho no HTML
+          atualizado.
+
+[IMG-04] Imagem sem uso na pasta (arquivo de reserva)
+  Observação: "esmeraldas_23-2150714266.jpg" (740x740, quadrada) está na
+  pasta images/ mas nenhuma seção do site a utiliza. Provavelmente é uma
+  versão alternativa da foto de esmeralda salva por engano. Foi mantida
+  como reserva — não afeta o funcionamento do site — mas fica o registro
+  para você decidir se quer apagá-la ou usá-la no lugar da atual.
+
+[IMG-05] Imagem de fundo do hero é pesada (observação, não corrigida)
+  A imagem "Cakes_Birthday_Candles_535027_3840x2400.jpg" pesa 1,7 MB e
+  tem 3840x2400 pixels — bem mais do que qualquer tela precisa exibir. O
+  próprio Parcel avisa isso ao compilar ("Cakes_...jpg ‼ 1.67 MB"). Não
+  redimensionei essa imagem porque é uma decisão de conteúdo (qual
+  qualidade/corte manter), mas fica registrado como melhoria futura —
+  uma versão em ~1920px de largura reduziria bastante o tempo de
+  carregamento sem perda visível de qualidade.
+
+
+------------------------------------------------------------------
+PARTE 3 - LINKS E SCRIPTS
+------------------------------------------------------------------
+
+[LNK-01] AOS carregado pela tag "@next" (versão instável)
+  Antes: https://unpkg.com/aos@next/dist/aos.css (e o .js equivalente)
+  Problema: "@next" não é um número de versão — é uma tag móvel que
+            pode apontar para builds de teste ou mudar de uma hora para
+            outra sem aviso, quebrando o site sem que você tenha
+            mudado nada no seu código.
+  Depois: fixado em @2.3.4 (versão estável mais recente da biblioteca),
+          tanto no CSS quanto no JS.
+
+[LNK-02] Contador regressivo com data no passado
+  Antes: const dataDoEvento = new Date("Feb 28, 2024 02:40:00");
+  Problema: 28/02/2024 já passou. O contador mostraria "Evento
+            Expirado" imediatamente para qualquer visitante a partir de
+            2024 — a régua central da página nunca funcionaria.
+  Depois: data trocada para um EXEMPLO futuro ("Dec 20, 2026 19:00:00"),
+          com um comentário no código lembrando de trocar pela data real
+          do seu evento. O texto correspondente no cabeçalho
+          ("28/02/2024 às 19hrs") também foi atualizado para bater com
+          o contador ("20/12/2026 às 19hrs").
+          IMPORTANTE: troque essa data pela data real da sua festa antes
+          de publicar.
+
+
+------------------------------------------------------------------
+PARTE 4 - OUTROS ERROS DE HTML/CSS
+------------------------------------------------------------------
+
+[HTM-01] <title>Document</title>
+  Depois: "Aniversário Deluxe — Convite e Contagem Regressiva". Também
+          foi acrescentada uma <meta name="description"> (ajuda o link
+          a mostrar um resumo quando compartilhado no WhatsApp/redes).
+
+[HTM-02] Tags <P> em maiúscula
+  Problema: HTML não é case-sensitive para nomes de tag, então o
+            navegador aceita <P>, mas por convenção e legibilidade toda
+            tag deve ficar em minúsculo — mistura de <P> com <p> no
+            mesmo arquivo é inconsistente.
+  Depois: as duas ocorrências de <P>...</P> viraram <p>...</p>.
+
+[CSS-01] Classe da descrição com erro de digitação (estilo nunca
+         aplicado)
+  Antes (SCSS): &__desciption { line-height: 22px; }
+  Antes (HTML): <p class="gift__details__description">
+  Problema: "desciption" (faltou o "r" de description) não bate com a
+            classe usada no HTML. O estilo de espaçamento entre linhas
+            do texto de cada presente nunca era aplicado.
+  Depois: corrigido para &__description, batendo com o HTML.
+
+[CSS-02] "gap" sem efeito nenhum (código morto) em duas ocorrências
+  Antes: .infos-bar__infos tinha display: contents e, mesmo assim,
+         "gap: 40px" (regra base) e depois "gap: 16px" (dentro de uma
+         media query em 1024px).
+  Problema: display: contents remove o elemento da árvore de caixas do
+            navegador — ele "desaparece" como caixa e só os filhos
+            (os <li>) continuam existindo para fins de layout. Uma
+            propriedade que depende de haver uma caixa, como "gap", não
+            tem efeito nenhum nesse caso. As duas declarações nunca
+            fizeram nada; quem realmente organiza o espaçamento é o
+            "justify-content: space-between" do elemento pai
+            (.infos-bar).
+  Depois: as duas declarações de "gap" foram removidas (a da media
+          query de 1024px, que só continha essa linha morta, foi
+          removida por completo) e um comentário explica o motivo, para
+          que ninguém tente "consertar" um gap que nunca funcionou.
+
+
+------------------------------------------------------------------
+RESUMO
+------------------------------------------------------------------
+Build quebrado (dependência morta):  1  (achado mais grave)
+Imagens desproporcionais/nome:       5
+Links e scripts:                     2
+Outros erros de HTML/CSS:            4
+Total de itens corrigidos:          12
+
+Como a correção foi validada:
+  Rodei "npm install" e "npx parcel build src/index.html" de verdade
+  durante esta revisão. Antes das correções, o build falhava por causa
+  do sharp; depois, terminou em ~3 segundos sem erros, e o CSS
+  compilado foi conferido linha a linha para confirmar que o
+  aspect-ratio, o object-fit e o círculo do logo saíram exatamente como
+  planejado.
+
+Lições principais:
+  1. Uma dependência de build (devDependency) que ninguém usa não é
+     inofensiva — ela pode impedir qualquer instalação nova de dar
+     certo, mesmo sem aparecer em nenhum import do seu código.
+  2. Largura OU altura fixa sozinha não garante proporção — se você
+     quer um círculo, largura e altura precisam ser iguais.
+  3. "margin: 0 auto" e depois "margin-right: valor-fixo" na mesma
+     regra se cancelam parcialmente — a centralização quebra sem
+     nenhum erro aparente no código.
+  4. Prefira sempre uma versão travada (ex.: @2.3.4) a tags móveis como
+     @next ou @latest em bibliotecas de terceiros.
+  5. Um typo de uma letra (desciption vs description) é o tipo de erro
+     que não gera nenhum aviso — o CSS "compila" normalmente, só não
+     bate com o HTML. Vale a pena usar autocomplete/Emmet para reduzir
+     esse risco.
+
+==================================================================
+Fim do relatório.
+==================================================================

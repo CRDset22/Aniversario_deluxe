@@ -9,7 +9,10 @@
     &__infos {
         width: 100%;
         display: contents;
-        gap: 40px;
+        /* Observação: "gap" não tem efeito aqui porque display:contents
+           remove esta lista da árvore de caixas — quem realmente
+           organiza o espaçamento é o .infos-bar pai, via
+           justify-content: space-between. */
 
         &__item {
             font-size: 14px;
@@ -33,12 +36,6 @@
             &__item {
                 margin-bottom: 24px;
             }
-        }
-    }
-
-    @media (max-width: 1024px) {
-        &__infos {
-            gap: 16px;
         }
     }
 
