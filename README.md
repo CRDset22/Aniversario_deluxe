@@ -39,6 +39,37 @@ o endereço no terminal, normalmente `http://localhost:1234`).
 
 ## Arquitetura de pastas e arquivos
 
+
+Estrutura de pastas e arquivos do projeto:
+
+```
+Aniversario_deluxe/
+├── package.json
+├── package-lock.json
+├── .gitignore
+├── README.md
+├── erros.txt
+└── src/
+    ├── index.html
+    ├── scripts/
+    │   └── main.js
+    ├── images/
+    │   ├── Cakes_Birthday_Candles_535027_3840x2400.jpg
+    │   ├── Logo_happy_birthday.jpg
+    │   ├── bitcoin.webp
+    │   ├── esmeraldas.png
+    │   ├── esmeraldas_23-2150714266.jpg   (reserva, sem uso)
+    │   ├── katana.jpg
+    │   └── lamborghini-gallardo.jpg
+    └── styles/
+        ├── main.scss
+        ├── _variables.scss
+        ├── _hero.scss
+        ├── _gift.scss
+        └── components/
+            └── _infos_bar.scss
+```
+
 O projeto segue a separação padrão de um projeto Parcel: tudo que é
 **código-fonte** fica dentro de `src/`; tudo que é **configuração da
 ferramenta de build** fica solto na raiz; e a pasta `dist/` (build
