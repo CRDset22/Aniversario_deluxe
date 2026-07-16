@@ -1,0 +1,21 @@
+.footer {
+    background-color: #111; // Fundo cinza escuro/preto para estilo premium
+    padding: 32px 0;
+    text-align: center;
+    border-top: 1px solid #ffd700; // Linha dourada delicada no topo do footer
+    
+    &__text {
+        color: #fff;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    &__subtext {
+        color: #aaa; // Texto secundário mais claro
+        font-family: 'Roboto', sans-serif;
+        font-size: 12px;
+        font-style: italic;
+    }
+}
